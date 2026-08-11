@@ -44,11 +44,33 @@ python main.py
 - If `ADCmc_settings.txt` is deleted, defaults are restored and a new file is created.
 - 关闭软件时会保存设置；删除配置文件后下次启动恢复默认并重新生成。
 
-## Disclaimer / 免责声明
+## License / 许可协议
 
-This project is intended **for learning and research purposes only**. Use responsibly and in compliance with applicable laws and the terms of any software or game you interact with.
+See [`LICENSE`](LICENSE) for the full English text (**MIT License with Anti-Abuse Clause**).
 
-本项目**仅供学习研究使用**。请合法、合规、负责任地使用。
+完整英文文本见 [`LICENSE`](LICENSE)（**附带使用限制的 MIT 许可**）。
+
+### 一、开源许可（MIT License）
+
+特此免费授予任何获得本软件副本及相关文档文件（以下简称「本软件」）的人，无限制使用本软件的权利，包括但不限于使用、复制、修改、合并、出版、分发、再许可和/或出售本软件副本，并允许向其提供本软件的人这样做，但须遵守以下条件：
+
+上述版权声明和本许可声明应包含在本软件的所有副本或主要部分中。
+
+### 二、使用限制与禁止行为
+
+1. 本软件仅用于学习、编程练习、单机本地测试。
+2. 严禁将本软件用于任何 Minecraft 官方服务器、第三方多人服务器、PVP 对战、排名/竞赛场景，违反者自行承担账号封禁、法律责任等全部后果。
+3. 严禁对本软件进行二次开发以实现绕过反作弊、注入游戏进程、修改游戏内存、抓包篡改数据等作弊功能。
+4. 严禁以任何形式商用、售卖、收费分发、捐赠变现、引流获利。
+5. 严禁移除、修改本软件中的版权声明与许可协议。
+
+### 三、免责声明（核心法律保护）
+
+本软件按「原样」提供，不提供任何明示或暗示的担保，包括但不限于适销性、特定用途适用性和非侵权担保。
+
+在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是合同、侵权或其他行为，因使用本软件、滥用本软件、在服务器违规使用导致的一切后果，均由使用者独立承担全部责任，作者不承担任何法律与连带责任。
+
+Copyright (c) 2026 WesternYao
 
 ## About the English text / 关于英文说明
 
