@@ -1,6 +1,6 @@
-MIT License with Anti-Abuse Clause for MC AutoClicker
+MIT License
 
-Copyright (c) 2026 WesternYao
+Copyright (c) 2026 WesYao
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -11,21 +11,6 @@ furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
-
-Usage Restrictions
-
-This Software is for learning, programming practice, and single-player/local
-testing only.
-
-Using this Software on any Minecraft public servers, multiplayer servers, PvP,
-or competitive modes is strictly prohibited.
-
-Modifying this Software to bypass anti-cheat, inject into game process,
-read/write game memory, or tamper with game data is prohibited.
-
-Commercial use, sale, paid distribution, donation monetization are prohibited.
-
-Disclaimer
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

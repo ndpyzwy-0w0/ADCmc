@@ -46,9 +46,9 @@ python main.py
 
 ## License / 许可协议
 
-See [`LICENSE`](LICENSE) for the full English text (**MIT License with Anti-Abuse Clause**).
+See [`LICENSE`](LICENSE) for the full English text (**MIT License**).
 
-完整英文文本见 [`LICENSE`](LICENSE)（**附带使用限制的 MIT 许可**）。
+完整英文文本见 [`LICENSE`](LICENSE)（**MIT 许可**）。
 
 ### 一、开源许可（MIT License）
 
@@ -56,21 +56,13 @@ See [`LICENSE`](LICENSE) for the full English text (**MIT License with Anti-Abus
 
 上述版权声明和本许可声明应包含在本软件的所有副本或主要部分中。
 
-### 二、使用限制与禁止行为
-
-1. 本软件仅用于学习、编程练习、单机本地测试。
-2. 严禁将本软件用于任何 Minecraft 官方服务器、第三方多人服务器、PVP 对战、排名/竞赛场景，违反者自行承担账号封禁、法律责任等全部后果。
-3. 严禁对本软件进行二次开发以实现绕过反作弊、注入游戏进程、修改游戏内存、抓包篡改数据等作弊功能。
-4. 严禁以任何形式商用、售卖、收费分发、捐赠变现、引流获利。
-5. 严禁移除、修改本软件中的版权声明与许可协议。
-
-### 三、免责声明（核心法律保护）
+### 二、免责声明（核心法律保护）
 
 本软件按「原样」提供，不提供任何明示或暗示的担保，包括但不限于适销性、特定用途适用性和非侵权担保。
 
 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是合同、侵权或其他行为，因使用本软件、滥用本软件、在服务器违规使用导致的一切后果，均由使用者独立承担全部责任，作者不承担任何法律与连带责任。
 
-Copyright (c) 2026 WesternYao
+Copyright (c) 2026 WesYao
 
 ## About the English text / 关于英文说明
 
