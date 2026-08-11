@@ -1,28 +1,28 @@
 # ADCmc
 
+[English](README.md) | [中文](README.zh-CN.md)
+
 A controllable Windows auto-clicker with dual left/right channels, speed curves, random timing jitter, hotkey and double-click triggers, DPI-aware UI, and local settings persistence. **For learning and research purposes only.**
 
-可控的 Windows 连点器：左右键双通道、速度曲线、随机时间偏移、热键/双击触发、DPI 自适应界面、本地设置记忆。**仅供学习研究使用。**
+## Features
 
-## Features / 功能
-
-| Feature | 说明 |
+| Feature | Description |
 | --- | --- |
-| Left / Right panels | 左右键独立连点板块，并排显示 |
-| Speed curves | 恒定 / 加速 / 减速 / 正弦 / 缓入缓出 / 自定义曲线 |
-| Random jitter | 可开关的随机时间偏移 |
-| Bind-key trigger | 录制键盘或鼠标侧键，按住连点 |
-| Double-click trigger | 双击间隔小于阈值开始；阈值内无继续输入则停止 |
-| DPI-aware UI | 适配高分屏与系统缩放，窗口可调整大小并滚动 |
-| Settings file | 同目录 `ADCmc_settings.txt` 记住设置 |
+| Left / Right panels | Independent left- and right-click panels, side by side |
+| Speed curves | Constant / accelerate / decelerate / sine / ease / custom |
+| Random jitter | Optional random timing offset between clicks |
+| Bind-key trigger | Record a keyboard or mouse side button; hold to click |
+| Double-click trigger | Start when two clicks fall within a threshold; stop if input stops |
+| DPI-aware UI | Scales with display DPI; resizable window with scrolling |
+| Settings file | Saves preferences to `ADCmc_settings.txt` next to the app |
 
-## Requirements / 环境
+## Requirements
 
 - Windows 10/11
-- Python 3.12+（开发运行）
-- 依赖见 `requirements.txt`（`pynput`、打包用 `pyinstaller`）
+- Python 3.12+ (for running from source)
+- See `requirements.txt` (`pynput`; `pyinstaller` for packaging)
 
-## Run from source / 源码运行
+## Run from source
 
 ```powershell
 cd ADCmc
@@ -30,42 +30,27 @@ python -m pip install -r requirements.txt
 python main.py
 ```
 
-## Build exe / 打包
+## Build exe
 
 ```powershell
 .\build.ps1
 ```
 
-生成文件：`dist\ADCmc.exe`
+Output: `dist\ADCmc.exe`
 
-## Notes / 说明
+## Notes
 
-- Closing the app saves settings next to the executable / script.
+- Closing the app saves settings next to the executable or script.
 - If `ADCmc_settings.txt` is deleted, defaults are restored and a new file is created.
-- 关闭软件时会保存设置；删除配置文件后下次启动恢复默认并重新生成。
 
-## License / 许可协议
+## License
 
-See [`LICENSE`](LICENSE) for the full English text (**MIT License**).
-
-完整英文文本见 [`LICENSE`](LICENSE)（**MIT 许可**）。
-
-### 一、开源许可（MIT License）
-
-特此免费授予任何获得本软件副本及相关文档文件（以下简称「本软件」）的人，无限制使用本软件的权利，包括但不限于使用、复制、修改、合并、出版、分发、再许可和/或出售本软件副本，并允许向其提供本软件的人这样做，但须遵守以下条件：
-
-上述版权声明和本许可声明应包含在本软件的所有副本或主要部分中。
-
-### 二、免责声明（核心法律保护）
-
-本软件按「原样」提供，不提供任何明示或暗示的担保，包括但不限于适销性、特定用途适用性和非侵权担保。
-
-在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是合同、侵权或其他行为，因使用本软件、滥用本软件、在服务器违规使用导致的一切后果，均由使用者独立承担全部责任，作者不承担任何法律与连带责任。
+This project is licensed under the [MIT License](LICENSE).
 
 Copyright (c) 2026 WesYao
 
-## About the English text / 关于英文说明
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. See [LICENSE](LICENSE) for the full text.
 
-My English is not strong enough to write the full introduction myself, so the English parts of this README were edited with the help of AI translation.
+## About the English text
 
-我的英语能力不足以支撑我编辑整个简介，因此使用了 AI 翻译进行编辑。
+My English is not strong enough to write the full introduction myself, so the English parts of this documentation were edited with the help of AI translation.
