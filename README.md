@@ -49,3 +49,9 @@ python main.py
 This project is intended **for learning and research purposes only**. Use responsibly and in compliance with applicable laws and the terms of any software or game you interact with.
 
 本项目**仅供学习研究使用**。请合法、合规、负责任地使用。
+
+## About the English text / 关于英文说明
+
+My English is not strong enough to write the full introduction myself, so the English parts of this README were edited with the help of AI translation.
+
+我的英语能力不足以支撑我编辑整个简介，因此使用了 AI 翻译进行编辑。
