@@ -17,7 +17,7 @@ from pynput import keyboard, mouse
 from pynput.mouse import Button, Controller as MouseController
 
 APP_TITLE = "ADCmc 连点器"
-VERSION = "1.8.2"
+VERSION = "1.8.3"
 SETTINGS_FILE = "ADCmc_settings.txt"
 
 # Set by enable_dpi_awareness() — Windows display scale vs 100%
@@ -418,6 +418,13 @@ class ClickPanel:
         self._drag_idx: int | None = None
         self._curve_progress = 0.0
         self._lock = threading.Lock()
+        self._run_id = 0
+        # The click worker only writes these plain Python values. Tk widgets
+        # are refreshed by one 30 FPS pump on the UI thread, preventing a
+        # large root.after queue from building up at high click rates.
+        self._ui_dirty = False
+        self._ui_interval_text = "当前间隔: —"
+        self._ui_pump_id: str | None = None
 
         self._bind: BindTarget | None = None
         self._bind_held = False
@@ -1061,27 +1068,28 @@ class ClickPanel:
             lo, hi, max_clicks, cycle, jitter_on, jitter_max = settings
             self._stop_event.clear()
             self._running = True
+            self._run_id += 1
+            run_id = self._run_id
             self._click_count = 0
             self._curve_progress = 0.0
+            self._ui_dirty = True
 
         root = self.app.root
-        root.after(0, lambda: self.count_var.set("已点击: 0"))
-        root.after(0, lambda: self._set_action_buttons(running=True))
-        root.after(0, self._redraw_curve)
+        self.count_var.set("已点击: 0")
+        self._set_action_buttons(running=True)
+        self._redraw_curve()
+        self._ensure_ui_pump()
 
         if from_trigger and self._bind_mode_active() and self._bind is not None:
             label = format_bind(self._bind)
-            root.after(0, lambda: self.status_var.set(f"连点中… 松开 [{label}] 停止"))
+            self.status_var.set(f"连点中… 松开 [{label}] 停止")
         elif self._double_mode_active():
             name = self.button_name
-            root.after(
-                0,
-                lambda: self.status_var.set(
-                    f"连点中… 请在阈值内持续{name}输入，否则自动停止"
-                ),
+            self.status_var.set(
+                f"连点中… 请在阈值内持续{name}输入，否则自动停止"
             )
         else:
-            root.after(0, lambda: self.status_var.set("连点中… 点「停止」或 Esc"))
+            self.status_var.set("连点中… 点「停止」或 Esc")
 
         use_keepalive = self._double_mode_active()
         if use_keepalive:
@@ -1090,6 +1098,11 @@ class ClickPanel:
         mode = self.curve_var.get()
         points = list(self._curve_points)
         keepalive_ms = self._double_threshold_ms() if use_keepalive else 0.0
+        fixed_pos = (
+            self._fixed_pos
+            if self.pos_mode.get() == "固定坐标"
+            else None
+        )
         self._worker = threading.Thread(
             target=self._click_loop,
             args=(
@@ -1102,6 +1115,8 @@ class ClickPanel:
                 jitter_on,
                 jitter_max,
                 keepalive_ms,
+                fixed_pos,
+                run_id,
             ),
             daemon=True,
         )
@@ -1109,12 +1124,29 @@ class ClickPanel:
 
     def stop_clicking(self) -> None:
         with self._lock:
+            run_id = self._run_id
             if not self._running:
-                self.app.root.after(0, self._on_stopped_ui)
+                self.app.root.after(
+                    0, lambda rid=run_id: self._on_stopped_ui(rid)
+                )
                 return
             self._stop_event.set()
             self._running = False
-        self.app.root.after(0, self._on_stopped_ui)
+        self.app.root.after(0, lambda rid=run_id: self._on_stopped_ui(rid))
+
+    def _ensure_ui_pump(self) -> None:
+        if self._ui_pump_id is None:
+            self._ui_pump_id = self.app.root.after(33, self._flush_click_ui)
+
+    def _flush_click_ui(self) -> None:
+        self._ui_pump_id = None
+        if self._ui_dirty:
+            self._ui_dirty = False
+            self.count_var.set(f"已点击: {self._click_count}")
+            self.interval_now_var.set(self._ui_interval_text)
+            self._redraw_curve()
+        if self._running:
+            self._ensure_ui_pump()
 
     def _set_action_buttons(self, *, running: bool) -> None:
         can_start = not (self.panel_enable_toggle and not self.enabled_var.get())
@@ -1130,7 +1162,16 @@ class ClickPanel:
                 )
             self.stop_btn.config(state="disabled", bg="#3a3030", disabledforeground=C.DIM)
 
-    def _on_stopped_ui(self) -> None:
+    def _on_stopped_ui(self, run_id: int | None = None) -> None:
+        if run_id is not None and run_id != self._run_id:
+            return
+        if self._ui_pump_id is not None:
+            try:
+                self.app.root.after_cancel(self._ui_pump_id)
+            except tk.TclError:
+                pass
+            self._ui_pump_id = None
+        self._flush_click_ui()
         self._set_action_buttons(running=False)
         self.status_var.set(self._idle_status())
 
@@ -1158,19 +1199,21 @@ class ClickPanel:
         jitter_on: bool,
         jitter_max: float,
         keepalive_ms: float,
+        fixed_pos: tuple[int, int] | None,
+        run_id: int,
     ) -> None:
         root = self.app.root
-        while not self._stop_event.is_set():
+        while not self._stop_event.is_set() and run_id == self._run_id:
             if self._keepalive_expired(keepalive_ms):
                 with self._lock:
-                    self._running = False
-                    self._stop_event.set()
-                root.after(0, self._on_stopped_ui)
+                    if run_id == self._run_id:
+                        self._running = False
+                        self._stop_event.set()
                 root.after(
                     0,
-                    lambda: self.status_var.set(
-                        f"已停止 — 阈值内无{self.button_name}输入"
-                    ),
+                    lambda rid=run_id: self._finish_worker_stop(
+                        f"已停止 — 阈值内无{self.button_name}输入", rid
+                    )
                 )
                 break
 
@@ -1188,24 +1231,17 @@ class ClickPanel:
             interval_ms = base_ms + jitter_ms
 
             self._curve_progress = t
-            root.after(0, self._redraw_curve)
             if jitter_on and jitter_ms > 0:
-                root.after(
-                    0,
-                    lambda b=base_ms, j=jitter_ms, tot=interval_ms: self.interval_now_var.set(
-                        f"当前间隔: {tot:.1f} ms (曲线 {b:.1f} + 偏移 {j:.1f})"
-                    ),
+                self._ui_interval_text = (
+                    f"当前间隔: {interval_ms:.1f} ms "
+                    f"(曲线 {base_ms:.1f} + 偏移 {jitter_ms:.1f})"
                 )
             else:
-                root.after(
-                    0,
-                    lambda ms=interval_ms: self.interval_now_var.set(
-                        f"当前间隔: {ms:.1f} ms"
-                    ),
-                )
+                self._ui_interval_text = f"当前间隔: {interval_ms:.1f} ms"
+            self._ui_dirty = True
 
-            if self.pos_mode.get() == "固定坐标" and self._fixed_pos:
-                self.app.mouse.position = self._fixed_pos
+            if fixed_pos:
+                self.app.mouse.position = fixed_pos
 
             self.app._emitting_button = self.click_button
             try:
@@ -1214,34 +1250,39 @@ class ClickPanel:
                 self.app._emitting_button = None
 
             self._click_count += 1
-            count = self._click_count
-            root.after(0, lambda c=count: self.count_var.set(f"已点击: {c}"))
+            self._ui_dirty = True
 
             if max_clicks > 0 and self._click_count >= max_clicks:
                 with self._lock:
-                    self._running = False
-                    self._stop_event.set()
+                    if run_id == self._run_id:
+                        self._running = False
+                        self._stop_event.set()
                 self._bind_held = False
-                root.after(0, self._on_stopped_ui)
                 root.after(
                     0,
-                    lambda: self.status_var.set(f"已达最大次数 {max_clicks}，已停止"),
+                    lambda rid=run_id: self._finish_worker_stop(
+                        f"已达最大次数 {max_clicks}，已停止", rid
+                    ),
                 )
                 break
 
             # Sleep in small slices so keepalive can stop promptly
             remaining = interval_ms / 1000.0
-            while remaining > 0 and not self._stop_event.is_set():
+            while (
+                remaining > 0
+                and not self._stop_event.is_set()
+                and run_id == self._run_id
+            ):
                 if self._keepalive_expired(keepalive_ms):
                     with self._lock:
-                        self._running = False
-                        self._stop_event.set()
-                    root.after(0, self._on_stopped_ui)
+                        if run_id == self._run_id:
+                            self._running = False
+                            self._stop_event.set()
                     root.after(
                         0,
-                        lambda: self.status_var.set(
-                            f"已停止 — 阈值内无{self.button_name}输入"
-                        ),
+                        lambda rid=run_id: self._finish_worker_stop(
+                            f"已停止 — 阈值内无{self.button_name}输入", rid
+                        )
                     )
                     remaining = 0
                     break
@@ -1252,7 +1293,14 @@ class ClickPanel:
                 remaining -= slice_s
 
         with self._lock:
-            self._running = False
+            if run_id == self._run_id:
+                self._running = False
+
+    def _finish_worker_stop(self, reason: str, run_id: int) -> None:
+        if run_id != self._run_id:
+            return
+        self._on_stopped_ui(run_id)
+        self.status_var.set(reason)
 
     def export_settings(self) -> dict:
         data: dict = {
